@@ -1,0 +1,18 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: build-camel-image-
+  namespace: camel-app
+spec:
+  pipelineRef:
+    name: build-camel-image
+  serviceAccountName: default
+  workspaces:
+    - name: my-workspace
+      persistentVolumeClaim:
+        claimName: pipeline-workspace  # Usando el PVC limpio
+  params:
+    - name: IMAGE
+      value: quay.io/eduvazles/apache-camel-rest-jdbc:latest
+    - name: BUILDER_IMAGE
+      value: registry.access.redhat.com/ubi8/openjdk-17:latest

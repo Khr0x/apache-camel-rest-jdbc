@@ -1,4 +1,4 @@
-CREATE DATABASE test;
+#CREATE DATABASE test;
 
 CREATE TABLE user(
     id int auto_increment primary key,
