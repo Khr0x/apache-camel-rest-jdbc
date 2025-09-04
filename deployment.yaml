@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demojdbc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demojdbc
+  template:
+    metadata:
+      labels:
+        app: demojdbc
+    spec:
+      containers:
+        - name: demojdbc
+          image: khrox/demojdbc:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: app-config
