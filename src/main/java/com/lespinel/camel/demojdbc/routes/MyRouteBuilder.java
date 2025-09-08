@@ -51,7 +51,7 @@ public class MyRouteBuilder extends RouteBuilder {
                     exchange.getIn().setHeader("from", from != null ? from : 0);
                     exchange.getIn().setHeader("to", to != null ? to : 10);
                 })
-                .setBody(simple("SELECT * FROM user LIMIT :?from, :?to "))
+                .setBody(simple("SELECT id, name, email, created_at AS createdAt, updated_at AS updatedAt FROM user LIMIT :?from, :?to "))
                 .to("jdbc:mysqlDatasource?useHeadersAsParameters=true&outputClass="+User.class.getName())
                 .log("Total results founds: ${headers.CamelJdbcRowCount}");
 
@@ -59,7 +59,7 @@ public class MyRouteBuilder extends RouteBuilder {
          * Route that return the user information depending on userId
          */
         from("direct:getUserById")
-                .setBody(simple("SELECT * FROM user WHERE id = :?userId"))
+                .setBody(simple("SELECT id, name, email, created_at AS createdAt, updated_at AS updatedAt FROM user WHERE id = :?userId"))
                 .to("jdbc:mysqlDatasource?outputType=SelectOne&useHeadersAsParameters=true&outputClass="+User.class.getName())
                 .log("Total results founds: ${headers.CamelJdbcRowCount}");
 
