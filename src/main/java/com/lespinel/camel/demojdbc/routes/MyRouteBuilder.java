@@ -36,6 +36,16 @@ public class MyRouteBuilder extends RouteBuilder {
                 .post()
                     .produces("application/json")
                     .to("direct:insertUser");
+        rest("/users-post")
+                .get()
+                    .outType(User[].class)
+                    .to("direct:getAllUsers")
+                .get("/{userId}")
+                    .outType(User.class)
+                    .to("direct:getUserById")
+                .post()
+                    .produces("application/json")
+                    .to("direct:insertUser");
 
         /*
          * Route that return the list of users from the MySQL Database
