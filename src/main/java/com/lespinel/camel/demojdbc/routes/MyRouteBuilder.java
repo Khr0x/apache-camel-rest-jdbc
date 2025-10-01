@@ -35,17 +35,14 @@ public class MyRouteBuilder extends RouteBuilder {
                     .to("direct:getUserById")
                 .post()
                     .produces("application/json")
-                    .to("direct:insertUser");
-        rest("/users-post")
-                .get()
-                    .outType(User[].class)
-                    .to("direct:getAllUsers")
-                .get("/{userId}")
-                    .outType(User.class)
-                    .to("direct:getUserById")
-                .post()
+                    .to("direct:insertUser")
+                .put("/{userId}")
+                    .consumes("application/json")
                     .produces("application/json")
-                    .to("direct:insertUser");
+                    .to("direct:updateUser")
+                .delete("/{userId}")
+                    .produces("application/json")
+                    .to("direct:deleteUser");
 
         /*
          * Route that return the list of users from the MySQL Database
@@ -89,6 +86,56 @@ public class MyRouteBuilder extends RouteBuilder {
                     }
                 })
                 .log("New user Created with key ${headers.CamelGeneratedKeysRows}");
+
+        /*
+         * Route for User update over MySQL database
+         */
+        from("direct:updateUser")
+                .process(exchange -> {
+                    String userId = exchange.getIn().getHeader("userId", String.class);
+                    exchange.getIn().setHeader("userId", userId);
+                })
+                .setBody(simple("UPDATE user SET name='${body[name]}', email='${body[email]}' WHERE id = :?userId"))
+                .to("jdbc:mysqlDatasource?useHeadersAsParameters=true")
+                .process(exchange -> {
+                    Integer rows = exchange.getIn().getHeader(JdbcConstants.JDBC_UPDATE_COUNT, Integer.class);
+                    if (rows != null && rows > 0) {
+                        exchange.getIn().setBody(Map.of(
+                                "message", "User updated successfully",
+                                "updatedRows", rows
+                        ));
+                        exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 200);
+                    } else {
+                        exchange.getIn().setBody(Map.of("error", "User not found"));
+                        exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 404);
+                    }
+                })
+                .log("User updated, rows affected: ${headers.CamelJdbcUpdateCount}");
+
+        /*
+         * Route for User deletion over MySQL database
+         */
+        from("direct:deleteUser")
+                .process(exchange -> {
+                    String userId = exchange.getIn().getHeader("userId", String.class);
+                    exchange.getIn().setHeader("userId", userId);
+                })
+                .setBody(simple("DELETE FROM user WHERE id = :?userId"))
+                .to("jdbc:mysqlDatasource?useHeadersAsParameters=true")
+                .process(exchange -> {
+                    Integer rows = exchange.getIn().getHeader(JdbcConstants.JDBC_UPDATE_COUNT, Integer.class);
+                    if (rows != null && rows > 0) {
+                        exchange.getIn().setBody(Map.of(
+                                "message", "User deleted successfully",
+                                "deletedRows", rows
+                        ));
+                        exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 200);
+                    } else {
+                        exchange.getIn().setBody(Map.of("error", "User not found"));
+                        exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 404);
+                    }
+                })
+                .log("User deleted, rows affected: ${headers.CamelJdbcUpdateCount}");
 
     }
 }
