@@ -10,7 +10,7 @@ spec:
   workspaces:
     - name: my-workspace
       persistentVolumeClaim:
-        claimName: pipeline-workspace  # Usando el PVC limpio
+        claimName: pipeline-workspace  
   params:
     - name: IMAGE
       value: quay.io/eduvazles/apache-camel-rest-jdbc:latest
