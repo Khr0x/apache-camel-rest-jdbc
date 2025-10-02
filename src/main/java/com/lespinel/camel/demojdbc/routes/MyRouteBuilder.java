@@ -53,7 +53,7 @@ public class MyRouteBuilder extends RouteBuilder {
                 })
                 .setBody(simple("SELECT * FROM user LIMIT :?from, :?to "))
                 .to("jdbc:mysqlDatasource?useHeadersAsParameters=true&outputClass="+User.class.getName())
-                .log("Cambio por Pipeline - Total results founds: ${headers.CamelJdbcRowCount}");
+                .log("Segundo Cambio por Pipeline - Total results founds: ${headers.CamelJdbcRowCount}");
 
         /*
          * Route that return the user information depending on userId
