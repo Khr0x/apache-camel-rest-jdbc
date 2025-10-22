@@ -17,9 +17,9 @@ public class MyRouteBuilder extends RouteBuilder {
     @PropertyInject("server.port")
     private Integer serverPort;
     @PropertyInject("server.port")
-    private Integer serverPort;
+    private Integer serverPort2;
     @PropertyInject("server.port")
-    private Integer serverPort;
+    private Integer serverPort3;
 
     @Override
     public void configure() throws Exception {
